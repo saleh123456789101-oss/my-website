@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سامانه مدرسه</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Tahoma,Arial,sans-serif;
+    background:linear-gradient(135deg,#dbeafe,#eef2ff);
+    color:#172033;
+}
+
+button,input,select,textarea{
+    font-family:inherit;
+}
+
+button{
+    border:0;
+    padding:11px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    background:#2563eb;
+    color:white;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+.danger{background:#dc2626}
+.success{background:#16a34a}
+.gray{background:#64748b}
+
+.login{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.login-box{
+    width:420px;
+    max-width:100%;
+    background:white;
+    padding:35px;
+    border-radius:25px;
+    box-shadow:0 15px 50px #0002;
+}
+
+.login-box h1{
+    text-align:center;
+    margin-bottom:8px;
+}
+
+.login-box p{
+    text-align:center;
+    color:#64748b;
+}
+
+input,select,textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    margin:7px 0 14px;
+    outline:none;
+    background:white;
+}
+
+textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+label{
+    font-weight:bold;
+}
+
+.login-btn{
+    width:100%;
+    font-size:16px;
+    margin-top:5px;
+}
+
+.error{
+    background:#fee2e2;
+    color:#991b1b;
+    padding:12px;
+    border-radius:10px;
+    margin-top:12px;
+    display:none;
+}
+
+.topbar{
+    background:#111827;
+    color:white;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.topbar button{
+    background:#dc2626;
+}
+
+.nav{
+    background:white;
+    padding:12px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    box-shadow:0 2px 10px #0001;
+}
+
+.nav button{
+    background:#e5e7eb;
+    color:#111827;
+}
+
+.nav button.active{
+    background:#2563eb;
+    color:white;
+}
+
+.container{
+    width:min(1100px,94%);
+    margin:25px auto;
+}
+
+.section{
+    display:none;
+}
+
+.section.active{
+    display:block;
+}
+
+.card{
+    background:white;
+    border-radius:18px;
+    padding:22px;
+    margin-bottom:20px;
+    box-shadow:0 7px 25px #00000010;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+}
+
+.stat{
+    background:white;
+    padding:20px;
+    border-radius:16px;
+    box-shadow:0 5px 20px #0000000d;
+}
+
+.number{
+    font-size:30px;
+    font-weight:bold;
+    color:#2563eb;
+    margin-top:8px;
+}
+
+.item{
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:13px;
+    padding:15px;
+    margin-bottom:12px;
+}
+
+.empty{
+    text-align:center;
+    padding:25px;
+    color:#64748b;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:11px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:right;
+}
+
+th{
+    background:#f1f5f9;
+}
+
+.small{
+    color:#64748b;
+    font-size:13px;
+}
+
+@media(max-width:600px){
+    .container{
+        width:94%;
+    }
+
+    .login-box{
+        padding:25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= ورود ================= -->
+
+<div id="loginPage" class="login">
+
+    <div class="login-box">
+
+        <h1>🏫 سامانه مدرسه</h1>
+
+        <p>نام کاربری و رمز عبور خود را وارد کنید</p>
+
+        <label>نام کاربری</label>
+        <input
+            id="loginUsername"
+            placeholder="نام کاربری"
+        >
+
+        <label>رمز عبور</label>
+        <input
+            id="loginPassword"
+            type="password"
+            placeholder="رمز عبور"
+        >
+
+        <button
+            class="login-btn"
+            onclick="login()"
+        >
+            ورود
+        </button>
+
+        <div id="loginError" class="error">
+            نام کاربری یا رمز عبور اشتباه است.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= برنامه اصلی ================= -->
+
+<div id="app" style="display:none">
+
+    <div class="topbar">
+
+        <div>
+            🏫 سامانه مدرسه
+            <span id="welcome"></span>
+        </div>
+
+        <button onclick="logout()">خروج</button>
+
+    </div>
+
+    <div class="nav" id="nav"></div>
+
+    <div class="container">
+
+
+        <!-- ================= داشبورد ================= -->
+
+        <div id="dashboard" class="section active">
+
+            <h2>🏠 صفحه اصلی</h2>
+
+            <div class="grid">
+
+                <div class="stat">
+                    👨‍🎓 دانش‌آموزان
+                    <div id="studentCount" class="number">0</div>
+                </div>
+
+                <div class="stat">
+                    👨‍💼 مدیران
+                    <div id="managerCount" class="number">0</div>
+                </div>
+
+                <div class="stat">
+                    📝 تکالیف
+                    <div id="homeworkCount" class="number">0</div>
+                </div>
+
+                <div class="stat">
+                    📊 نمرات
+                    <div id="gradeCount" class="number">0</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= مدیریت کاربران ================= -->
+
+        <div id="users" class="section">
+
+            <h2>👥 مدیریت کاربران</h2>
+
+            <div class="grid">
+
+                <!-- مدیر -->
+
+                <div class="card">
+
+                    <h3>👨‍💼 اضافه کردن مدیر</h3>
+
+                    <label>نام مدیر</label>
+                    <input id="managerName" placeholder="مثلاً علی رضایی">
+
+                    <label>نام کاربری</label>
+                    <input id="managerUsername" placeholder="نام کاربری">
+
+                    <label>رمز عبور</label>
+                    <input id="managerPassword" type="password">
+
+                    <button onclick="addManager()">
+                        اضافه کردن مدیر
+                    </button>
+
+                </div>
+
+
+                <!-- دانش آموز -->
+
+                <div class="card">
+
+                    <h3>👨‍🎓 اضافه کردن دانش‌آموز</h3>
+
+                    <label>نام و نام خانوادگی</label>
+                    <input id="studentName" placeholder="مثلاً علی رضایی">
+
+                    <label>نام کاربری</label>
+                    <input id="studentUsername" placeholder="نام کاربری">
+
+                    <label>رمز عبور</label>
+                    <input id="studentPassword" type="password">
+
+                    <label>کلاس</label>
+                    <input id="studentClass" placeholder="مثلاً هفتم الف">
+
+                    <button
+                        class="success"
+                        onclick="addStudent()"
+                    >
+                        اضافه کردن دانش‌آموز
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>👨‍💼 مدیران</h3>
+
+                <div id="managerList"></div>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>👨‍🎓 دانش‌آموزان</h3>
+
+                <div id="studentList"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= تکالیف ================= -->
+
+        <div id="homework" class="section">
+
+            <h2>📝 تکالیف</h2>
+
+            <div class="card">
+
+                <h3>➕ ثبت تکلیف</h3>
+
+                <label>دانش‌آموز</label>
+                <select id="homeworkStudent"></select>
+
+                <label>عنوان</label>
+                <input id="homeworkTitle">
+
+                <label>توضیحات</label>
+                <textarea id="homeworkText"></textarea>
+
+                <label>تاریخ تحویل</label>
+                <input id="homeworkDate" type="date">
+
+                <button onclick="addHomework()">
+                    ثبت تکلیف
+                </button>
+
+            </div>
+
+            <div class="card">
+
+                <div id="homeworkList"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= نمرات ================= -->
+
+        <div id="grades" class="section">
+
+            <h2>📊 نمرات</h2>
+
+            <div class="card">
+
+                <h3>➕ ثبت نمره</h3>
+
+                <label>دانش‌آموز</label>
+                <select id="gradeStudent"></select>
+
+                <label>درس</label>
+                <input id="gradeSubject">
+
+                <label>نمره</label>
+                <input
+                    id="gradeValue"
+                    type="number"
+                    min="0"
+                    max="20"
+                >
+
+                <label>توضیحات</label>
+                <input id="gradeNote">
+
+                <button onclick="addGrade()">
+                    ثبت نمره
+                </button>
+
+            </div>
+
+            <div class="card">
+
+                <div id="gradeList"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= برنامه هفتگی ================= -->
+
+        <div id="schedule" class="section">
+
+            <h2>📅 برنامه هفتگی</h2>
+
+            <div class="card">
+
+                <h3>➕ اضافه کردن برنامه</h3>
+
+                <label>روز</label>
+
+                <select id="scheduleDay">
+                    <option>شنبه</option>
+                    <option>یکشنبه</option>
+                    <option>دوشنبه</option>
+                    <option>سه‌شنبه</option>
+                    <option>چهارشنبه</option>
+                    <option>پنجشنبه</option>
+                </select>
+
+                <label>ساعت</label>
+                <input id="scheduleTime" placeholder="08:00">
+
+                <label>درس</label>
+                <input id="scheduleSubject">
+
+                <button onclick="addSchedule()">
+                    ثبت برنامه
+                </button>
+
+            </div>
+
+            <div class="card">
+
+                <div id="scheduleList"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= اطلاعیه ================= -->
+
+        <div id="notices" class="section">
+
+            <h2>📢 اطلاعیه‌ها</h2>
+
+            <div class="card">
+
+                <h3>➕ اطلاعیه جدید</h3>
+
+                <label>عنوان</label>
+                <input id="noticeTitle">
+
+                <label>متن</label>
+                <textarea id="noticeText"></textarea>
+
+                <button onclick="addNotice()">
+                    انتشار اطلاعیه
+                </button>
+
+            </div>
+
+            <div class="card">
+
+                <div id="noticeList"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= پروفایل دانش آموز ================= -->
+
+        <div id="profile" class="section">
+
+            <h2>👤 پروفایل من</h2>
+
+            <div class="card" id="profileBox"></div>
+
+        </div>
+
+
+        <!-- ================= تکالیف من ================= -->
+
+        <div id="myHomework" class="section">
+
+            <h2>📝 تکالیف من</h2>
+
+            <div class="card" id="myHomeworkList"></div>
+
+        </div>
+
+
+        <!-- ================= نمرات من ================= -->
+
+        <div id="myGrades" class="section">
+
+            <h2>📊 نمرات من</h2>
+
+            <div class="card" id="myGradesList"></div>
+
+        </div>
+
+
+        <!-- ================= برنامه من ================= -->
+
+        <div id="mySchedule" class="section">
+
+            <h2>📅 برنامه هفتگی</h2>
+
+            <div class="card" id="myScheduleList"></div>
+
+        </div>
+
+
+        <!-- ================= اطلاعیه های من ================= -->
+
+        <div id="myNotices" class="section">
+
+            <h2>📢 اطلاعیه‌ها</h2>
+
+            <div class="card" id="myNoticesList"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   اطلاعات سیستم
+========================================================= */
+
+const KEY = "SCHOOL_SYSTEM_FINAL_V1";
+
+let db = JSON.parse(localStorage.getItem(KEY)) || {
+
+    managers:[
+        {
+            id:1,
+            name:"محمدصالح",
+            username:"محمدصالح",
+            password:"00001"
+        }
+    ],
+
+    students:[],
+    homework:[],
+    grades:[],
+    schedule:[],
+    notices:[]
+
+};
+
+let currentUser = null;
+let currentType = null;
+
+
+/* ذخیره */
+
+function save(){
+    localStorage.setItem(KEY,JSON.stringify(db));
+}
+
+
+/* =========================================================
+   ورود
+========================================================= */
+
+function login(){
+
+    const username =
+        document.getElementById("loginUsername").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    let manager = db.managers.find(x =>
+        x.username === username &&
+        x.password === password
+    );
+
+    if(manager){
+
+        currentUser = manager;
+        currentType = "manager";
+
+        openApp();
+
+        return;
+    }
+
+
+    let student = db.students.find(x =>
+        x.username === username &&
+        x.password === password
+    );
+
+    if(student){
+
+        currentUser = student;
+        currentType = "student";
+
+        openApp();
+
+        return;
+    }
+
+
+    document.getElementById("loginError").style.display="block";
+
+}
+
+
+function openApp(){
+
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("app").style.display="block";
+
+    document.getElementById("welcome").textContent =
+        " | " + currentUser.name;
+
+    createNavigation();
+
+    refresh();
+
+}
+
+
+function logout(){
+
+    currentUser=null;
+    currentType=null;
+
+    document.getElementById("app").style.display="none";
+    document.getElementById("loginPage").style.display="flex";
+
+    document.getElementById("loginUsername").value="";
+    document.getElementById("loginPassword").value="";
+
+}
+
+
+/* Enter */
+
+document.getElementById("loginPassword")
+.addEventListener("keydown",function(e){
+
+    if(e.key==="Enter"){
+        login();
+    }
+
+});
+
+
+/* =========================================================
+   منوی مدیر / دانش آموز
+========================================================= */
+
+function createNavigation(){
+
+    const nav=document.getElementById("nav");
+
+    nav.innerHTML="";
+
+
+    if(currentType==="manager"){
+
+        addNav("🏠 خانه","dashboard");
+        addNav("👥 کاربران","users");
+        addNav("📝 تکالیف","homework");
+        addNav("📊 نمرات","grades");
+        addNav("📅 برنامه هفتگی","schedule");
+        addNav("📢 اطلاعیه‌ها","notices");
+
+    }else{
+
+        addNav("🏠 خانه","dashboard");
+        addNav("👤 پروفایل","profile");
+        addNav("📝 تکالیف من","myHomework");
+        addNav("📊 نمرات من","myGrades");
+        addNav("📅 برنامه هفتگی","mySchedule");
+        addNav("📢 اطلاعیه‌ها","myNotices");
+
+    }
+
+}
+
+
+function addNav(text,id){
+
+    const btn=document.createElement("button");
+
+    btn.textContent=text;
+
+    btn.onclick=function(){
+
+        document.querySelectorAll(".section")
+        .forEach(x=>x.classList.remove("active"));
+
+        document.getElementById(id)
+        .classList.add("active");
+
+        document.querySelectorAll(".nav button")
+        .forEach(x=>x.classList.remove("active"));
+
+        btn.classList.add("active");
+
+    };
+
+    document.getElementById("nav").appendChild(btn);
+
+}
+
+
+/* =========================================================
+   اضافه کردن مدیر
+========================================================= */
+
+function addManager(){
+
+    if(currentType!=="manager") return;
+
+    const name=
+        document.getElementById("managerName").value.trim();
+
+    const username=
+        document.getElementById("managerUsername").value.trim();
+
+    const password=
+        document.getElementById("managerPassword").value;
+
+    if(!name || !username || !password){
+
+        alert("همه اطلاعات مدیر را وارد کن.");
+        return;
+
+    }
+
+    if(
+        db.managers.some(x=>x.username===username) ||
+        db.students.some(x=>x.username===username)
+    ){
+
+        alert("این نام کاربری قبلاً استفاده شده.");
+        return;
+
+    }
+
+    db.managers.push({
+
+        id:Date.now(),
+        name,
+        username,
+        password
+
+    });
+
+    save();
+
+    document.getElementById("managerName").value="";
+    document.getElementById("managerUsername").value="";
+    document.getElementById("managerPassword").value="";
+
+    refresh();
+
+    alert("مدیر با موفقیت اضافه شد.");
+
+}
+
+
+/* =========================================================
+   اضافه کردن دانش آموز
+========================================================= */
+
+function addStudent(){
+
+    if(currentType!=="manager") return;
+
+    const name=
+        document.getElementById("studentName").value.trim();
+
+    const username=
+        document.getElementById("studentUsername").value.trim();
+
+    const password=
+        document.getElementById("studentPassword").value;
+
+    const className=
+        document.getElementById("studentClass").value.trim();
+
+
+    if(!name || !username || !password){
+
+        alert("نام، نام کاربری و رمز را وارد کن.");
+        return;
+
+    }
+
+
+    if(
+        db.managers.some(x=>x.username===username) ||
+        db.students.some(x=>x.username===username)
+    ){
+
+        alert("این نام کاربری قبلاً استفاده شده.");
+        return;
+
+    }
+
+
+    db.students.push({
+
+        id:Date.now(),
+        name,
+        username,
+        password,
+        className
+
+    });
+
+
+    save();
+
+
+    document.getElementById("studentName").value="";
+    document.getElementById("studentUsername").value="";
+    document.getElementById("studentPassword").value="";
+    document.getElementById("studentClass").value="";
+
+
+    refresh();
+
+    alert("دانش‌آموز با موفقیت اضافه شد.");
+
+}
+
+
+/* =========================================================
+   حذف مدیر
+========================================================= */
+
+function deleteManager(id){
+
+    if(db.managers.length<=1){
+
+        alert("حداقل یک مدیر باید باقی بماند.");
+        return;
+
+    }
+
+    if(!confirm("این مدیر حذف شود؟")) return;
+
+    db.managers=
+        db.managers.filter(x=>x.id!==id);
+
+    save();
+
+    refresh();
+
+}
+
+
+/* =========================================================
+   حذف دانش آموز
+========================================================= */
+
+function deleteStudent(id){
+
+    if(!confirm("دانش‌آموز حذف شود؟")) return;
+
+    db.students=
+        db.students.filter(x=>x.id!==id);
+
+    db.homework=
+        db.homework.filter(x=>x.studentId!==id);
+
+    db.grades=
+        db.grades.filter(x=>x.studentId!==id);
+
+    save();
+
+    refresh();
+
+}
+
+
+/* =========================================================
+   تکلیف
+========================================================= */
+
+function addHomework(){
+
+    const studentId=
+        Number(document.getElementById("homeworkStudent").value);
+
+    const title=
+        document.getElementById("homeworkTitle").value.trim();
+
+    const text=
+        document.getElementById("homeworkText").value.trim();
+
+    const date=
+        document.getElementById("homeworkDate").value;
+
+
+    if(!studentId || !title){
+
+        alert("دانش‌آموز و عنوان را وارد کن.");
+        return;
+
+    }
+
+
+    db.homework.push({
+
+        id:Date.now(),
+        studentId,
+        title,
+        text,
+        date
+
+    });
+
+
+    save();
+
+    refresh();
+
+    alert("تکلیف ثبت شد.");
+
+}
+
+
+/* =========================================================
+   نمره
+========================================================= */
+
+function addGrade(){
+
+    const studentId=
+        Number(document.getElementById("gradeStudent").value);
+
+    const subject=
+        document.getElementById("gradeSubject").value.trim();
+
+    const value=
+        document.getElementById("gradeValue").value;
+
+    const note=
+        document.getElementById("gradeNote").value.trim();
+
+
+    if(!studentId || !subject || value===""){
+
+        alert("اطلاعات نمره را کامل کن.");
+        return;
+
+    }
+
+
+    db.grades.push({
+
+        id:Date.now(),
+        studentId,
+        subject,
+        value,
+        note
+
+    });
+
+
+    save();
+
+    refresh();
+
+    alert("نمره ثبت شد.");
+
+}
+
+
+/* =========================================================
+   برنامه
+========================================================= */
+
+function addSchedule(){
+
+    const day=
+        document.getElementById("scheduleDay").value;
+
+    const time=
+        document.getElementById("scheduleTime").value.trim();
+
+    const subject=
+        document.getElementById("scheduleSubject").value.trim();
+
+
+    if(!time || !subject){
+
+        alert("ساعت و درس را وارد کن.");
+        return;
+
+    }
+
+
+    db.schedule.push({
+
+        id:Date.now(),
+        day,
+        time,
+        subject
+
+    });
+
+
+    save();
+
+    refresh();
+
+    alert("برنامه ثبت شد.");
+
+}
+
+
+/* =========================================================
+   اطلاعیه
+========================================================= */
+
+function addNotice(){
+
+    const title=
+        document.getElementById("noticeTitle").value.trim();
+
+    const text=
+        document.getElementById("noticeText").value.trim();
+
+
+    if(!title || !text){
+
+        alert("عنوان و متن را وارد کن.");
+        return;
+
+    }
+
+
+    db.notices.unshift({
+
+        id:Date.now(),
+        title,
+        text,
+        date:new Date().toLocaleDateString("fa-IR")
+
+    });
+
+
+    save();
+
+    refresh();
+
+    alert("اطلاعیه منتشر شد.");
+
+}
+
+
+/* =========================================================
+   بروزرسانی
+========================================================= */
+
+function refresh(){
+
+    document.getElementById("studentCount").textContent=
+        db.students.length;
+
+    document.getElementById("managerCount").textContent=
+        db.managers.length;
+
+    document.getElementById("homeworkCount").textContent=
+        db.homework.length;
+
+    document.getElementById("gradeCount").textContent=
+        db.grades.length;
+
+
+    if(currentType==="manager"){
+
+        renderManagers();
+        renderStudents();
+        fillStudents();
+        renderHomework();
+        renderGrades();
+        renderSchedule();
+        renderNotices();
+
+    }else{
+
+        renderStudentProfile();
+        renderMyHomework();
+        renderMyGrades();
+        renderMySchedule();
+        renderMyNotices();
+
+    }
+
+}
+
+
+/* =========================================================
+   لیست مدیران
+========================================================= */
+
+function renderManagers(){
+
+    const box=document.getElementById("managerList");
+
+    box.innerHTML=db.managers.map(m=>`
+
+        <div class="item">
+
+            <b>👨‍💼 ${safe(m.name)}</b>
+
+            <p>
+                نام کاربری:
+                ${safe(m.username)}
+            </p>
+
+            ${
+                m.id!==currentUser.id
+                ?
+                `<button
+                    class="danger"
+                    onclick="deleteManager(${m.id})">
+                    حذف
+                </button>`
+                :
+                `<span class="small">
+                    حساب فعلی
+                </span>`
+            }
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =========================================================
+   لیست دانش آموزان
+========================================================= */
+
+function renderStudents(){
+
+    const box=document.getElementById("studentList");
+
+    if(db.students.length===0){
+
+        box.innerHTML=
+            '<div class="empty">هنوز دانش‌آموزی اضافه نشده.</div>';
+
+        return;
+
+    }
+
+
+    box.innerHTML=`
+
+        <table>
+
+            <tr>
+                <th>نام</th>
+                <th>نام کاربری</th>
+                <th>کلاس</th>
+                <th>عملیات</th>
+            </tr>
+
+            ${
+                db.students.map(s=>`
+
+                    <tr>
+
+                        <td>${safe(s.name)}</td>
+
+                        <td>${safe(s.username)}</td>
+
+                        <td>${safe(s.className || "-")}</td>
+
+                        <td>
+
+                            <button
+                                class="danger"
+                                onclick="deleteStudent(${s.id})">
+                                حذف
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                `).join("")
+            }
+
+        </table>
+
+    `;
+
+}
+
+
+/* =========================================================
+   انتخاب دانش آموز
+========================================================= */
+
+function fillStudents(){
+
+    ["homeworkStudent","gradeStudent"]
+    .forEach(id=>{
+
+        const select=document.getElementById(id);
+
+        select.innerHTML=
+            '<option value="">انتخاب دانش‌آموز</option>';
+
+        db.students.forEach(s=>{
+
+            const option=document.createElement("option");
+
+            option.value=s.id;
+
+            option.textContent=
+                s.name+" ("+s.username+")";
+
+            select.appendChild(option);
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   نمایش تکالیف مدیر
+========================================================= */
+
+function renderHomework(){
+
+    const box=document.getElementById("homeworkList");
+
+    if(db.homework.length===0){
+
+        box.innerHTML=
+            '<div class="empty">تکلیفی وجود ندارد.</div>';
+
+        return;
+
+    }
+
+
+    box.innerHTML=db.homework.map(h=>{
+
+        const s=
+            db.students.find(x=>x.id===h.studentId);
+
+        return `
+
+            <div class="item">
+
+                <h3>📝 ${safe(h.title)}</h3>
+
+                <p>
+                    👨‍🎓
+                    ${s ? safe(s.name) : "حذف شده"}
+                </p>
+
+                <p>${safe(h.text)}</p>
+
+                <p class="small">
+                    تاریخ:
+                    ${safe(h.date || "-")}
+                </p>
+
+            </div>
+
+        `;
+
+    }).join("");
+
+}
+
+
+/* =========================================================
+   نمایش نمرات مدیر
+========================================================= */
+
+function renderGrades(){
+
+    const box=document.getElementById("gradeList");
+
+    if(db.grades.length===0){
+
+        box.innerHTML=
+            '<div class="empty">نمره‌ای وجود ندارد.</div>';
+
+        return;
+
+    }
+
+
+    box.innerHTML=db.grades.map(g=>{
+
+        const s=
+            db.students.find(x=>x.id===g.studentId);
+
+        return `
+
+            <div class="item">
+
+                <h3>📊 ${safe(g.subject)}</h3>
+
+                <p>
+                    دانش‌آموز:
+                    ${s ? safe(s.name) : "حذف شده"}
+                </p>
+
+                <p>
+                    نمره:
+                    <b>${safe(g.value)}</b>
+                    از ۲۰
+                </p>
+
+                <p>
+                    ${safe(g.note || "")}
+                </p>
+
+            </div>
+
+        `;
+
+    }).join("");
+
+}
+
+
+/* =========================================================
+   برنامه مدیر
+========================================================= */
+
+function renderSchedule(){
+
+    const box=document.getElementById("scheduleList");
+
+    if(db.schedule.length===0){
+
+        box.innerHTML=
+            '<div class="empty">برنامه‌ای ثبت نشده.</div>';
+
+        return;
+
+    }
+
+
+    box.innerHTML=db.schedule.map(x=>`
+
+        <div class="item">
+
+            📅 <b>${safe(x.day)}</b>
+
+            <br>
+
+            ⏰ ${safe(x.time)}
+
+            —
+
+            ${safe(x.subject)}
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =========================================================
+   اطلاعیه مدیر
+========================================================= */
+
+function renderNotices(){
+
+    const box=document.getElementById("noticeList");
+
+    if(db.notices.length===0){
+
+        box.innerHTML=
+            '<div class="empty">اطلاعیه‌ای وجود ندارد.</div>';
+
+        return;
+
+    }
+
+
+    box.innerHTML=db.notices.map(n=>`
+
+        <div class="item">
+
+            <h3>📢 ${safe(n.title)}</h3>
+
+            <p>${safe(n.text)}</p>
+
+            <div class="small">
+                ${safe(n.date)}
+            </div>
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =========================================================
+   پروفایل دانش آموز
+========================================================= */
+
+function renderStudentProfile(){
+
+    const box=document.getElementById("profileBox");
+
+    box.innerHTML=`
+
+        <p>
+            👤 نام:
+            <b>${safe(currentUser.name)}</b>
+        </p>
+
+        <p>
+            🔑 نام کاربری:
+            <b>${safe(currentUser.username)}</b>
+        </p>
+
+        <p>
+            🏫 کلاس:
+            <b>${safe(currentUser.className || "-")}</b>
+        </p>
+
+    `;
+
+}
+
+
+/* =========================================================
+   تکالیف دانش آموز
+========================================================= */
+
+function renderMyHomework(){
+
+    const box=document.getElementById("myHomeworkList");
+
+    const list=db.homework.filter(
+        x=>x.studentId===currentUser.id
+    );
+
+
+    if(list.length===0){
+
+        box.innerHTML=
+            '<div class="empty">تکلیفی برای شما ثبت نشده.</div>';
+
+        return;
+
+    }
+
+
+    box.innerHTML=list.map(h=>`
+
+        <div class="item">
+
+            <h3>📝 ${safe(h.title)}</h3>
+
+            <p>${safe(h.text)}</p>
+
+            <p>
+                📅 تحویل:
+                ${safe(h.date || "-")}
+            </p>
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =========================================================
+   نمرات دانش آموز
+========================================================= */
+
+function renderMyGrades(){
+
+    const box=document.getElementById("myGradesList");
+
+    const list=db.grades.filter(
+        x=>x.studentId===currentUser.id
+    );
+
+
+    if(list.length===0){
+
+        box.innerHTML=
+            '<div class="empty">هنوز نمره‌ای ثبت نشده.</div>';
+
+        return;
+
+    }
+
+
+    box.innerHTML=`
+
+        <table>
+
+            <tr>
+                <th>درس</th>
+                <th>نمره</th>
+                <th>توضیحات</th>
+            </tr>
+
+            ${
+                list.map(g=>`
+
+                    <tr>
+
+                        <td>${safe(g.subject)}</td>
+
+                        <td>
+                            <b>${safe(g.value)}</b>
+                        </td>
+
+                        <td>
+                            ${safe(g.note || "-")}
+                        </td>
+
+                    </tr>
+
+                `).join("")
+            }
+
+        </table>
+
+    `;
+
+}
+
+
+/* =========================================================
+   برنامه دانش آموز
+========================================================= */
+
+function renderMySchedule(){
+
+    const box=document.getElementById("myScheduleList");
+
+    if(db.schedule.length===0){
+
+        box.innerHTML=
+            '<div class="empty">برنامه‌ای ثبت نشده.</div>';
+
+        return;
+
+    }
+
+
+    box.innerHTML=db.schedule.map(x=>`
+
+        <div class="item">
+
+            📅 <b>${safe(x.day)}</b>
+
+            <br>
+
+            ⏰ ${safe(x.time)}
+
+            —
+
+            ${safe(x.subject)}
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =========================================================
+   اطلاعیه دانش آموز
+========================================================= */
+
+function renderMyNotices(){
+
+    const box=document.getElementById("myNoticesList");
+
+    if(db.notices.length===0){
+
+        box.innerHTML=
+            '<div class="empty">اطلاعیه‌ای وجود ندارد.</div>';
+
+        return;
+
+    }
+
+
+    box.innerHTML=db.notices.map(n=>`
+
+        <div class="item">
+
+            <h3>📢 ${safe(n.title)}</h3>
+
+            <p>${safe(n.text)}</p>
+
+            <div class="small">
+                ${safe(n.date)}
+            </div>
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =========================================================
+   امنیت نمایش متن
+========================================================= */
+
+function safe(value){
+
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+save();
+
+</script>
+
+</body>
+</html>
